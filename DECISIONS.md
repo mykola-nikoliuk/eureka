@@ -30,3 +30,19 @@ Why the demo is built the way it is. One line per decision, with the reason.
    once accuracy is proven, since not every device has a strong GPU or WebGPU support.
 9. **First step.** A vessel holding a 2×2 square, plus the measuring cylinder. Passes when, after
    everything settles, both the 2×2 square and a 1×4 strip read 4 ± 0.2, over several runs.
+10. **Layout.** The top third of the screen is the container a shape starts in, the bottom two
+    thirds is the vessel. The water is always deeper than the container is tall, and a shape is
+    always smaller than its container with a gap around it, so a sunk shape is fully under water
+    and the fluid can flow past it. The measuring cylinder comes after the simplified version
+    works; until then the reading is the level rise in the vessel itself.
+11. **Stencil.** Collisions with an arbitrary shape use a stencil: a fine grid in the shape's own
+    coordinates, where each occupied cell stores a vector to the nearest free cell. A drop
+    inside an occupied cell is pushed out along that vector. The stencil is grown by a drop's
+    radius, so a drop whose centre is outside the shape but whose edge overlaps it is caught
+    too. The shape is rigid and doesn't rotate, so the stencil is built once per shape, and a
+    drop is checked by moving it into the shape's coordinates. The shape against the floor and
+    walls uses its real outline, not the grown stencil, so it lies flat on the floor.
+12. **Drops against a shape.** The push direction is the stencil vector, which is the normal to
+    the edge, not the line between centres. The correction is split in inverse proportion to
+    the masses (mass = area × density): the drop takes almost all of it and the shape slows down
+    a little. Hundreds of such hits are what make the water resist a sinking shape.
